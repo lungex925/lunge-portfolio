@@ -1,6 +1,9 @@
 "use strict";
 
 const works = [
+  {id:"GpiNI4VucK8",title:"工程師投資 10 年，只留下 0050、台積電跟美光｜羅潘",duration:"50:15",seconds:3015,category:"talk",channel:"rixin"},
+  {id:"g7PonGR-aKM",title:"3 個員工全部離職，戴蒙最痛的創業教訓｜貳輪嶼",duration:"25:29",seconds:1529,category:"talk",channel:"rixin"},
+  {id:"wNsO5etqfqw",title:"「網紅已經不值錢了」業配退潮與自媒體的下一步｜酷炫老師",duration:"54:56",seconds:3296,category:"talk",channel:"rixin"},
   {id:"Y71QbZmNe64",title:"時薪 36 元到飾品品牌老闆｜WhyNot 壞吶",duration:"16:12",seconds:972,category:"portrait"},
   {id:"L7CN-1bPIUE",title:"放棄百萬年薪，用 30 萬存款創業｜麥莉 MILEY",duration:"15:49",seconds:949,category:"portrait"},
   {id:"0zMqt_d5U4M",title:"仁海宮夜市走訪與新手擺攤成本",duration:"11:01",seconds:661,category:"location"},
@@ -20,18 +23,21 @@ const featured = [
 ];
 const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
 const grid = document.querySelector("#work-grid");
-const categoryName = c => c === "portrait" ? "人物故事" : "市場與市集";
+const categoryName = c => ({portrait:"人物故事",location:"市場與市集",talk:"訪談節目"})[c];
+const channelName = c => c === "rixin" ? "日薪八百窮學徒" : "我媽叫我不要創業";
+const matchesFilter = (w,filter) => filter==="all" || (filter==="long" ? w.seconds>=600 : w.category===filter);
 
 function makeCard(work,index){
   const article=document.createElement("article");article.className="work-card";article.style.setProperty("--delay",`${Math.min(index,5)*45}ms`);
-  article.innerHTML=`<button class="work-image video-trigger" data-video="${work.id}" aria-label="播放：${work.title}"><img src="assets/${work.id}.jpg" alt="${work.title}作品縮圖" width="1280" height="720" loading="lazy"><span class="work-play" aria-hidden="true">▶</span><span class="work-duration">${work.duration}</span></button><div class="work-meta"><span>${categoryName(work.category)}</span><span>拍攝・剪輯</span></div><h3><button class="video-trigger" data-video="${work.id}">${work.title}</button></h3>`;
+  article.innerHTML=`<button class="work-image video-trigger" data-video="${work.id}" aria-label="播放：${work.title}"><img src="assets/${work.id}.jpg" alt="${work.title}作品縮圖" width="1280" height="720" loading="lazy"><span class="work-play" aria-hidden="true">▶</span><span class="work-duration">${work.duration}</span></button><div class="work-meta"><span>${categoryName(work.category)}</span><span>${channelName(work.channel)}</span></div><h3><button class="video-trigger" data-video="${work.id}">${work.title}</button></h3>`;
   return article;
 }
 function renderWorks(filter="all"){
-  const filtered=works.filter(w=>filter==="all" || (filter==="long" ? w.seconds>=600 : w.category===filter));
+  const filtered=works.filter(w=>matchesFilter(w,filter));
   grid.replaceChildren(...filtered.map(makeCard));
   document.querySelector("#result-count").textContent=`${filtered.length} 支作品`;
 }
+document.querySelectorAll("[data-filter]").forEach(b=>{const count=b.querySelector("span");if(count)count.textContent=works.filter(w=>matchesFilter(w,b.dataset.filter)).length});
 renderWorks();
 document.querySelectorAll("[data-filter]").forEach(button=>button.addEventListener("click",()=>{
   document.querySelectorAll("[data-filter]").forEach(b=>{const selected=b===button;b.classList.toggle("active",selected);b.setAttribute("aria-pressed",selected)});
